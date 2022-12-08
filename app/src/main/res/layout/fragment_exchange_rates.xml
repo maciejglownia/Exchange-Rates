@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragments.ExchangeRatesFragment">
+
+    <!--    <ProgressBar-->
+<!--        android:id="@+id/progress_bar"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:visibility="gone"-->
+<!--        tools:visibility="visible" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/text_view_error"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_above="@id/button_retry"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:text="Unable to load data!"-->
+<!--        android:visibility="gone"-->
+<!--        tools:visibility="visible" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/button_retry"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:layout_margin="16dp"-->
+<!--        android:backgroundTint="@color/black"-->
+<!--        android:text="Retry"-->
+<!--        android:visibility="visible"-->
+<!--        tools:visibility="visible" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/text_view_empty"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:text="No result has been found!"-->
+<!--        android:visibility="gone"-->
+<!--        tools:visibility="visible" />-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/exchange_rates_row_layout" />
+
+    <Button
+        android:id="@+id/buttonMoveToDetails"
+        android:layout_width="match_parent"
+        android:layout_margin="16dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content"
+        android:text="Move to the next fragment" />
+</RelativeLayout>

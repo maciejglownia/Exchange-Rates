@@ -6,6 +6,6 @@ import retrofit2.http.*
 interface ExchangeRatesDataApi {
 
     @GET("/fixer/{date}")
-    @Headers("apikey: KDlIVBCbY2rmBeHJhK9xH4kSOnevn3u9")
+    @Headers("apikey: UJSUxXUxVns23fo5rZHlu31PM6PMubKb")
     suspend fun fetchExchangeRatesData(@Path("date") date: String): ExchangeRatesData
 }

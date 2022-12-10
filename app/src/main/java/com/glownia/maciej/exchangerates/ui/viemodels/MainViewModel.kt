@@ -1,44 +1,48 @@
 package com.glownia.maciej.exchangerates.ui.viemodels
 
 import android.util.Log
-import androidx.lifecycle.*
-import com.glownia.maciej.exchangerates.data.ExchangeRateData
-import com.glownia.maciej.exchangerates.data.Rates
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
 import com.glownia.maciej.exchangerates.repository.Repository
+import com.glownia.maciej.exchangerates.utils.Constants.DAY_WORD
+import com.glownia.maciej.exchangerates.utils.Constants.MAIN_VIEW_MODEL_TAG
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-class MainViewModel(state: SavedStateHandle) : ViewModel() {
+class MainViewModel : ViewModel() {
 
-    private val TAG = "MainScreenViewModel"
-    val repository: Repository = Repository()
+    private val repository: Repository = Repository()
 
-
-    private val _exRatesData = MutableLiveData<ExchangeRateData>()
-    val exRatesData: LiveData<ExchangeRateData>
-        get() = _exRatesData
-
-    private val _rates = MutableLiveData<List<Rates>>()
-    val rates: LiveData<List<Rates>>
-        get() = _rates
+    private val _exchangeRatesDataList = MutableLiveData<List<SingleRowDataPatternDto>>()
+    val exchangeRatesDataList: LiveData<List<SingleRowDataPatternDto>>
+        get() = _exchangeRatesDataList
 
     init {
-        getExRates()
+        getExchangeRates()
     }
 
-    private fun getExRates() {
+    private fun getExchangeRates() {
         viewModelScope.launch {
             try {
-                Log.e("LoginViewModel", "getUserData() is trying...")
+                Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates() is trying to get data from API.")
                 val result = repository.getDataFromApi(CURRENT_DATE)
-                _exRatesData.value = result
 
+                // To this list a new object will be added -> list will be displayed in fragment
+                val rateDataList = ArrayList<SingleRowDataPatternDto>()
+                rateDataList.add(SingleRowDataPatternDto(DAY_WORD, "${result.date} :"))
+                result.rates.forEach { (currencySymbol, valueAccordingToBaseCurrency) ->
+                    rateDataList.add(SingleRowDataPatternDto("$currencySymbol :",
+                        valueAccordingToBaseCurrency.toString()))
+                }
+                _exchangeRatesDataList.value = rateDataList
             } catch (e: IOException) {
-                Log.d(TAG, "getExchangeRatesSafeCall: is IOException...")
-
+                Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates(): ${e.message}")
             } catch (e: HttpException) {
-                Log.d(TAG, "getExchangeRatesSafeCall: is HttpException...")
+                Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates(): ${e.message}")
             }
         }
     }

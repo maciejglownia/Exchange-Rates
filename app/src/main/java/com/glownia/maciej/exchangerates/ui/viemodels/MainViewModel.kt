@@ -12,6 +12,7 @@ import com.glownia.maciej.exchangerates.utils.Constants.MAIN_VIEW_MODEL_TAG
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.time.LocalDate
 
 class MainViewModel : ViewModel() {
 
@@ -21,15 +22,25 @@ class MainViewModel : ViewModel() {
     val exchangeRatesDataList: LiveData<List<SingleRowDataPatternDto>>
         get() = _exchangeRatesDataList
 
+    // Represents current date when user open application. Date is in format "YYYY-MM-DD".
+    private var requestedDate = LocalDate.now() // 10 -> get -> 9
+
     init {
         getExchangeRates()
     }
 
-    private fun getExchangeRates() {
+    fun getExchangeRates() {
         viewModelScope.launch {
             try {
-                Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates() is trying to get data from API.")
-                val result = repository.getDataFromApi(CURRENT_DATE)
+                Log.i(MAIN_VIEW_MODEL_TAG,
+                    "getExchangeRates() : requestDate now is: $requestedDate.")
+                val result = repository.getDataFromApi(requestedDate.toString())
+                Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates() getDataFromApi executed.")
+                // After every time when the app gets data from API, the requestedDate is
+                // changing to previous one until it will meet the oldest available date in API.
+                requestedDate = requestedDate.minusDays(1)
+                Log.i(MAIN_VIEW_MODEL_TAG,
+                    "getExchangeRates() : requestDate after subtract 1 is: $requestedDate.")
 
                 // To this list a new object will be added -> list will be displayed in fragment
                 val rateDataList = ArrayList<SingleRowDataPatternDto>()
@@ -47,7 +58,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    companion object {
-        private const val CURRENT_DATE = "2022-12-07"
+    fun getCosTam() {
+        TODO("Not yet implemented")
     }
 }

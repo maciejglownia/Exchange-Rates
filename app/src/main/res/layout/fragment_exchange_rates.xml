@@ -52,12 +52,4 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/single_row" />
 
-    <Button
-        android:id="@+id/buttonMoveToDetails"
-        android:layout_width="match_parent"
-        android:layout_margin="16dp"
-        android:layout_centerInParent="true"
-        android:layout_alignParentBottom="true"
-        android:layout_height="wrap_content"
-        android:text="Move to the next fragment" />
 </RelativeLayout>

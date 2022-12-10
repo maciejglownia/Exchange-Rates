@@ -29,15 +29,13 @@ class ExchangeRatesDataFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val exchangeRatesDataAdapter = ExchangeRatesDataAdapter()
-
         mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) {
-            it.let {
-                exchangeRatesDataAdapter.submitList(it)
+            val exchangeRatesDataAdapter = ExchangeRatesDataAdapter(it)
+            binding.recyclerView.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = exchangeRatesDataAdapter
             }
         }
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerView.adapter = exchangeRatesDataAdapter
     }
 
     override fun onDestroyView() {

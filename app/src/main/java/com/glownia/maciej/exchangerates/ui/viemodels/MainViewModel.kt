@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.glownia.maciej.exchangerates.data.ExchangeRatesData
 import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
 import com.glownia.maciej.exchangerates.repository.Repository
 import com.glownia.maciej.exchangerates.utils.Constants.DAY_WORD
@@ -41,15 +42,7 @@ class MainViewModel : ViewModel() {
                 requestedDate = requestedDate.minusDays(1)
                 Log.i(MAIN_VIEW_MODEL_TAG,
                     "getExchangeRates() : requestDate after subtract 1 is: $requestedDate.")
-
-                // To this list a new object will be added -> list will be displayed in fragment
-                val rateDataList = ArrayList<SingleRowDataPatternDto>()
-                rateDataList.add(SingleRowDataPatternDto(DAY_WORD, "${result.date} :"))
-                result.rates.forEach { (currencySymbol, valueAccordingToBaseCurrency) ->
-                    rateDataList.add(SingleRowDataPatternDto("$currencySymbol :",
-                        valueAccordingToBaseCurrency.toString()))
-                }
-                _exchangeRatesDataList.value = rateDataList
+                createListContainingExchangeRatesDataGetFromApi(result)
             } catch (e: IOException) {
                 Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates(): ${e.message}")
             } catch (e: HttpException) {
@@ -58,7 +51,14 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun getCosTam() {
-        TODO("Not yet implemented")
+    // To this list a new object will be added -> list will be displaying in in the ExchangeRateDataFragment
+    private fun createListContainingExchangeRatesDataGetFromApi(result: ExchangeRatesData) {
+        val exchangeRatesDataList = ArrayList<SingleRowDataPatternDto>()
+        exchangeRatesDataList.add(SingleRowDataPatternDto(DAY_WORD, "${result.date} :"))
+        result.rates.forEach { (currencySymbol, valueAccordingToBaseCurrency) ->
+            exchangeRatesDataList.add(SingleRowDataPatternDto("$currencySymbol :",
+                valueAccordingToBaseCurrency.toString()))
+        }
+        _exchangeRatesDataList.value = exchangeRatesDataList
     }
 }

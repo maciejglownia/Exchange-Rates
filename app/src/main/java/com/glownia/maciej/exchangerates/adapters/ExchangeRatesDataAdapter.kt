@@ -5,32 +5,32 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.glownia.maciej.exchangerates.data.ExchangeRateData
-import com.glownia.maciej.exchangerates.databinding.ExchangeRatesRowLayoutBinding
+import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
+import com.glownia.maciej.exchangerates.databinding.SingleRowBinding
 
 class ExchangeRatesDataAdapter(
-) : ListAdapter<ExchangeRateData, ExchangeRatesDataAdapter.ExchangeRatesDataViewHolder>(
+) : ListAdapter<SingleRowDataPatternDto, ExchangeRatesDataAdapter.ExchangeRatesDataViewHolder>(
     DiffCallback) {
 
     inner class ExchangeRatesDataViewHolder(
-        private var binding: ExchangeRatesRowLayoutBinding,
+        private var binding: SingleRowBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.currencyNameTextView
-            binding.currencyValueTextView
+            binding.nameTextView
+            binding.valueTextView
         }
 
-        fun bind(exchangeRateData: ExchangeRateData) {
-            binding.currencyNameTextView.text = "Day:"
-            binding.currencyValueTextView.text = exchangeRateData.date
+        fun bind(exchangeRateData: SingleRowDataPatternDto) {
+            binding.nameTextView.text = exchangeRateData.name
+            binding.valueTextView.text = exchangeRateData.value
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExchangeRatesDataViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return ExchangeRatesDataViewHolder(
-            ExchangeRatesRowLayoutBinding.inflate(layoutInflater, parent, false)
+            SingleRowBinding.inflate(layoutInflater, parent, false)
         )
     }
 
@@ -40,17 +40,17 @@ class ExchangeRatesDataAdapter(
     }
 
     companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<ExchangeRateData>() {
+        private val DiffCallback = object : DiffUtil.ItemCallback<SingleRowDataPatternDto>() {
             override fun areItemsTheSame(
-                oldItem: ExchangeRateData,
-                newItem: ExchangeRateData,
+                oldItem: SingleRowDataPatternDto,
+                newItem: SingleRowDataPatternDto,
             ): Boolean {
-                return oldItem.date == newItem.date
+                return oldItem.name == newItem.name
             }
 
             override fun areContentsTheSame(
-                oldItem: ExchangeRateData,
-                newItem: ExchangeRateData,
+                oldItem: SingleRowDataPatternDto,
+                newItem: SingleRowDataPatternDto,
             ): Boolean {
                 return oldItem == newItem
             }

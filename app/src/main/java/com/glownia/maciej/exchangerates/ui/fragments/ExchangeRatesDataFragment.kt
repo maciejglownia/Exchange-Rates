@@ -8,13 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.glownia.maciej.exchangerates.adapters.ExchangeRatesDataAdapter
-import com.glownia.maciej.exchangerates.data.ExchangeRateData
 import com.glownia.maciej.exchangerates.databinding.FragmentExchangeRatesBinding
 import com.glownia.maciej.exchangerates.ui.viemodels.MainViewModel
 
-class ExchangeRatesFragment : Fragment() {
+class ExchangeRatesDataFragment : Fragment() {
 
-    private val TAG = "ExchangeRatesDataFragment"
     private var _binding: FragmentExchangeRatesBinding? = null
     private val binding get() = _binding!!
 
@@ -23,7 +21,7 @@ class ExchangeRatesFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         _binding = FragmentExchangeRatesBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -33,11 +31,9 @@ class ExchangeRatesFragment : Fragment() {
 
         val exchangeRatesDataAdapter = ExchangeRatesDataAdapter()
 
-        mainViewModel.exRatesData.observe(viewLifecycleOwner) { exRates ->
-            val data = arrayListOf<ExchangeRateData>()
-            data.add(exRates)
-            exRates.let {
-                exchangeRatesDataAdapter.submitList(data)
+        mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) {
+            it.let {
+                exchangeRatesDataAdapter.submitList(it)
             }
         }
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())

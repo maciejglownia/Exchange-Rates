@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.ExchangeRatesFragment">
+    tools:context=".ui.fragments.ExchangeRatesDataFragment">
 
     <!--    <ProgressBar-->
 <!--        android:id="@+id/progress_bar"-->
@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/exchange_rates_row_layout" />
+        tools:listitem="@layout/single_row" />
 
     <Button
         android:id="@+id/buttonMoveToDetails"

@@ -27,11 +27,6 @@ class MainViewModel : ViewModel() {
     // Represents current date when user open application. Date is in format "YYYY-MM-DD".
     private var _requestedDate = LocalDate.now()
 
-    // Represents current date formatted to "DD-MM-YYYY"
-    private var _currentDate = MutableLiveData<String>()
-    val currentDate: LiveData<String>
-        get() = _currentDate
-
     init {
         getExchangeRates()
     }
@@ -47,8 +42,6 @@ class MainViewModel : ViewModel() {
                 // Create objects and add to list
                 // data - base - rates as <symbol, value>
                 createListContainingExchangeRatesDataGetFromApi(result)
-                _currentDate.value = formatDateToOneNeededToDisplayToUser(_requestedDate.toString())
-
                 // After every time when the app gets data from API, the requestedDate is
                 // changing to previous one until it will meet the oldest available date in API.
                 _requestedDate = _requestedDate.minusDays(1)
@@ -65,11 +58,12 @@ class MainViewModel : ViewModel() {
     // To this list a new object will be added -> list will be displaying in in the ExchangeRateDataFragment
     private fun createListContainingExchangeRatesDataGetFromApi(result: ExchangeRatesData) {
         val exchangeRatesDataList = ArrayList<SingleRowDataPatternDto>()
-        val formattedDate = formatDateToOneNeededToDisplayToUser(result.date)
-        exchangeRatesDataList.add(SingleRowDataPatternDto(DAY_WORD, "$formattedDate :"))
+        val formattedDate = formatDateToOneNeededToDisplayToUser(result.date).toString()
+        exchangeRatesDataList.add(SingleRowDataPatternDto(DAY_WORD, "$formattedDate :", result.base, formattedDate))
+        // Map iterating
         result.rates.forEach { (currencySymbol, valueAccordingToBaseCurrency) ->
             exchangeRatesDataList.add(SingleRowDataPatternDto("$currencySymbol :",
-                valueAccordingToBaseCurrency.toString()))
+                valueAccordingToBaseCurrency.toString(), result.base, formattedDate))
         }
         _exchangeRatesDataList.value = exchangeRatesDataList
     }

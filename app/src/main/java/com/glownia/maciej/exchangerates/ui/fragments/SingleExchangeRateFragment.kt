@@ -33,10 +33,7 @@ class SingleExchangeRateFragment : Fragment() {
 
         val argumentData = args.exchangeRatesDataArgument
         binding.apply {
-            mainViewModel.currentDate.observe(viewLifecycleOwner) {
-                val dateString = "Dzień: $it"
-                dateTextView.text = dateString
-            }
+            dateTextView.text = argumentData.date
             valueTextView.text = argumentData.value
         }
     }

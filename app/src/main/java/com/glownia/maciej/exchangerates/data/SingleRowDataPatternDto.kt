@@ -15,4 +15,6 @@ import kotlinx.parcelize.Parcelize
 data class SingleRowDataPatternDto(
     val name: String,
     val value: String,
+    val base: String,
+    val date: String,
 ): Parcelable

@@ -5,8 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.glownia.maciej.exchangerates.adapters.ExchangeRatesDataAdapter
@@ -45,7 +47,17 @@ class ExchangeRatesDataFragment : Fragment() {
         var firstVisibleItem: Int
         var visibleItemCount: Int
         var totalItemCount: Int
-        val exchangeRatesDataAdapter = ExchangeRatesDataAdapter(it)
+        val exchangeRatesDataAdapter = ExchangeRatesDataAdapter(it) {
+            if (it.name != "Dzień") {
+                val action =
+                    ExchangeRatesDataFragmentDirections.actionFirstFragmentToSecondFragment(it)
+                findNavController().navigate(action)
+            } else {
+                Toast.makeText(requireContext(),
+                    "Wybierz konkretną walutę z jej wartością aby poznać szczegóły.",
+                    Toast.LENGTH_SHORT).show()
+            }
+        }
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = exchangeRatesDataAdapter
@@ -54,7 +66,6 @@ class ExchangeRatesDataFragment : Fragment() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
                     visibleItemCount = recyclerView.childCount
-                    Log.i(EXCHANGE_RATES_FRAGMENT_TAG, "creating creating")
                     totalItemCount = (layoutManager as LinearLayoutManager).itemCount
                     firstVisibleItem =
                         (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()

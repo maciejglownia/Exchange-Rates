@@ -1,5 +1,8 @@
 package com.glownia.maciej.exchangerates.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 /**
  * Data Transfer Object.
  * Will be used to display in a single row in a list in RecyclerView:
@@ -8,7 +11,8 @@ package com.glownia.maciej.exchangerates.data
  * @param value will be date or value of currency already calculated based on base currency from
  * JSON object.
  */
+@Parcelize
 data class SingleRowDataPatternDto(
     val name: String,
     val value: String,
-)
+): Parcelable

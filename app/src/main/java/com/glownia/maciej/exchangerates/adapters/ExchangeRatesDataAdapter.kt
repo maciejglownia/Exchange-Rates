@@ -8,6 +8,7 @@ import com.glownia.maciej.exchangerates.databinding.SingleRowBinding
 
 class ExchangeRatesDataAdapter(
     private val exchangeRateDataList: List<SingleRowDataPatternDto>,
+    private val onItemClicked: (SingleRowDataPatternDto) -> Unit,
 ) : RecyclerView.Adapter<ExchangeRatesDataAdapter.ExchangeRatesDataViewHolder>() {
 
     class ExchangeRatesDataViewHolder(
@@ -26,6 +27,9 @@ class ExchangeRatesDataAdapter(
 
     override fun onBindViewHolder(holder: ExchangeRatesDataViewHolder, position: Int) {
         val currentExchangeRatesData = exchangeRateDataList[position]
+        holder.itemView.setOnClickListener {
+            onItemClicked(currentExchangeRatesData)
+        }
         holder.bind(currentExchangeRatesData)
     }
 

@@ -16,6 +16,7 @@ import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
 import com.glownia.maciej.exchangerates.databinding.FragmentExchangeRatesBinding
 import com.glownia.maciej.exchangerates.ui.viemodels.MainViewModel
 import com.glownia.maciej.exchangerates.utils.Constants.EXCHANGE_RATES_FRAGMENT_TAG
+import com.glownia.maciej.exchangerates.utils.NetworkResult
 
 class ExchangeRatesDataFragment : Fragment() {
 
@@ -35,8 +36,33 @@ class ExchangeRatesDataFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) {
-            setupRecyclerView(it)
+        mainViewModel.exchangeRatesDataResponse.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is NetworkResult.Success -> {
+                    mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Success.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        setupRecyclerView(it)
+                    }
+                }
+                is NetworkResult.Error -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is NetworkResult.Loading -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Loading...",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
     }
 

@@ -1,17 +1,16 @@
 package com.glownia.maciej.exchangerates.ui.viemodels
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.glownia.maciej.exchangerates.data.ExchangeRatesData
 import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
 import com.glownia.maciej.exchangerates.repository.Repository
 import com.glownia.maciej.exchangerates.utils.Constants.DAY_WORD
 import com.glownia.maciej.exchangerates.utils.Constants.MAIN_VIEW_MODEL_TAG
+import com.glownia.maciej.exchangerates.utils.NetworkResult
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import retrofit2.Response
 import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -27,6 +26,8 @@ class MainViewModel : ViewModel() {
     // Represents current date when user open application. Date is in format "YYYY-MM-DD".
     private var _requestedDate = LocalDate.now()
 
+    var exchangeRatesDataResponse: MutableLiveData<NetworkResult<ExchangeRatesData>> = MutableLiveData()
+
     init {
         getExchangeRates()
     }
@@ -36,21 +37,19 @@ class MainViewModel : ViewModel() {
             try {
                 Log.i(MAIN_VIEW_MODEL_TAG,
                     "getExchangeRates() : requestDate now is: $_requestedDate.")
-                // Get data
-                val result = repository.getDataFromApi(_requestedDate.toString())
-                Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates() getDataFromApi executed.")
+                exchangeRatesDataResponse.value = NetworkResult.Loading()
+                val response = repository.getDataFromApi(_requestedDate.toString())
+                exchangeRatesDataResponse.value = handleExchangeRatesDataResponse(response)
                 // Create objects and add to list
                 // data - base - rates as <symbol, value>
-                createListContainingExchangeRatesDataGetFromApi(result)
+                response.body()?.let { createListContainingExchangeRatesDataGetFromApi(it) }
                 // After every time when the app gets data from API, the requestedDate is
                 // changing to previous one until it will meet the oldest available date in API.
                 _requestedDate = _requestedDate.minusDays(1)
-                Log.i(MAIN_VIEW_MODEL_TAG,
-                    "getExchangeRates() : requestDate after subtract 1 is: $_requestedDate.")
             } catch (e: IOException) {
-                Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates(): ${e.message}")
+                exchangeRatesDataResponse.value = NetworkResult.Error("Exchange rates data not found.")
             } catch (e: HttpException) {
-                Log.i(MAIN_VIEW_MODEL_TAG, "getExchangeRates(): ${e.message}")
+                exchangeRatesDataResponse.value = NetworkResult.Error("No Internet Connection.")
             }
         }
     }
@@ -72,5 +71,36 @@ class MainViewModel : ViewModel() {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val formatter2 = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         return LocalDate.parse(dateToFormat, formatter).format(formatter2)
+    }
+
+    private fun handleExchangeRatesDataResponse(response: Response<ExchangeRatesData>): NetworkResult<ExchangeRatesData> {
+        when {
+            response.message().toString().contains("timeout") -> {
+                return NetworkResult.Error("Timeout.")
+            }
+            response.code() == 400 -> {
+                return NetworkResult.Error("Request unacceptable.")
+            }
+            response.code() == 401 -> {
+                return NetworkResult.Error("No valid API key provided.")
+            }
+            response.code() == 404 -> {
+                return NetworkResult.Error("The requested resource doesn't exist.")
+            }
+            response.code() == 429 -> {
+                return NetworkResult.Error("API request limit exceeded.")
+            }
+            response.body()!!.date.isEmpty() || response.body()!!.base.isEmpty() ||
+                    response.body()!!.rates.isEmpty() -> {
+                return NetworkResult.Error("Exchange rates data not found.")
+            }
+            response.isSuccessful -> {
+                val exchangeRatesData = response.body()
+                return NetworkResult.Success(exchangeRatesData!!)
+            }
+            else -> {
+                return NetworkResult.Error(response.message())
+            }
+        }
     }
 }

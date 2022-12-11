@@ -5,11 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.glownia.maciej.exchangerates.databinding.FragmentSingleExchangeRateBinding
+import com.glownia.maciej.exchangerates.ui.viemodels.MainViewModel
 
 class SingleExchangeRateFragment : Fragment() {
 
+    private val mainViewModel by viewModels<MainViewModel>()
     private val args: SingleExchangeRateFragmentArgs by navArgs()
 
     private var _binding: FragmentSingleExchangeRateBinding? = null
@@ -20,7 +23,7 @@ class SingleExchangeRateFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         _binding = FragmentSingleExchangeRateBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -30,7 +33,10 @@ class SingleExchangeRateFragment : Fragment() {
 
         val argumentData = args.exchangeRatesDataArgument
         binding.apply {
-            dateTextView.text = "Date"
+            mainViewModel.currentDate.observe(viewLifecycleOwner) {
+                val dateString = "Dzień: $it"
+                dateTextView.text = dateString
+            }
             valueTextView.text = argumentData.value
         }
     }

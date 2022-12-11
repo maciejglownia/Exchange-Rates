@@ -40,6 +40,10 @@ class ExchangeRatesDataFragment : Fragment() {
             when (response) {
                 is NetworkResult.Success -> {
                     mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) {
+                        binding.recyclerView.visibility = View.VISIBLE
+                        binding.errorImageView.visibility = View.GONE
+                        binding.errorTextView.visibility = View.GONE
+                        binding.progressBar.visibility = View.GONE
                         Toast.makeText(
                             requireContext(),
                             "Success.",
@@ -49,13 +53,23 @@ class ExchangeRatesDataFragment : Fragment() {
                     }
                 }
                 is NetworkResult.Error -> {
+                    binding.recyclerView.visibility = View.GONE
+                    binding.errorImageView.visibility = View.VISIBLE
+                    binding.errorTextView.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(
                         requireContext(),
                         "Error!",
                         Toast.LENGTH_SHORT
                     ).show()
+
                 }
                 is NetworkResult.Loading -> {
+                    binding.recyclerView.visibility = View.GONE
+                    binding.errorImageView.visibility = View.GONE
+                    binding.errorTextView.visibility = View.GONE
+                    binding.progressBar.visibility = View.VISIBLE
+
                     Toast.makeText(
                         requireContext(),
                         "Loading...",

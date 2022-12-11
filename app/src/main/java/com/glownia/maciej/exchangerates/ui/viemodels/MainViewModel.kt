@@ -5,9 +5,11 @@ import androidx.lifecycle.*
 import com.glownia.maciej.exchangerates.data.ExchangeRatesData
 import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
 import com.glownia.maciej.exchangerates.repository.Repository
+import com.glownia.maciej.exchangerates.utils.Constants
 import com.glownia.maciej.exchangerates.utils.Constants.DAY_WORD
 import com.glownia.maciej.exchangerates.utils.Constants.MAIN_VIEW_MODEL_TAG
 import com.glownia.maciej.exchangerates.utils.NetworkResult
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import retrofit2.Response
@@ -37,6 +39,7 @@ class MainViewModel : ViewModel() {
             try {
                 Log.i(MAIN_VIEW_MODEL_TAG,
                     "getExchangeRates() : requestDate now is: $_requestedDate.")
+                delay(Constants.GETTING_EXCHANGES_RATES_DAYA_FROM_API_TIME_DELAY)
                 exchangeRatesDataResponse.value = NetworkResult.Loading()
                 val response = repository.getDataFromApi(_requestedDate.toString())
                 exchangeRatesDataResponse.value = handleExchangeRatesDataResponse(response)

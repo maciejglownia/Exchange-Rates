@@ -120,7 +120,7 @@ class ExchangeRatesDataFragment : Fragment() {
                     ) {
                         // End has been reached
                         Log.i(EXCHANGE_RATES_FRAGMENT_TAG, "Last row has been met.")
-                        mainViewModel.getExchangeRates()
+                        mainViewModel.getExchangeRatesData()
                         loading = true
                     }
                 }

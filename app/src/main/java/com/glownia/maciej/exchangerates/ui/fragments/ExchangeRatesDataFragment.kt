@@ -44,11 +44,6 @@ class ExchangeRatesDataFragment : Fragment() {
                         binding.errorImageView.visibility = View.GONE
                         binding.errorTextView.visibility = View.GONE
                         binding.progressBar.visibility = View.GONE
-                        Toast.makeText(
-                            requireContext(),
-                            "Success.",
-                            Toast.LENGTH_SHORT
-                        ).show()
                         setupRecyclerView(it)
                     }
                 }
@@ -57,24 +52,12 @@ class ExchangeRatesDataFragment : Fragment() {
                     binding.errorImageView.visibility = View.VISIBLE
                     binding.errorTextView.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.GONE
-                    Toast.makeText(
-                        requireContext(),
-                        "Error!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
                 }
                 is NetworkResult.Loading -> {
                     binding.recyclerView.visibility = View.GONE
                     binding.errorImageView.visibility = View.GONE
                     binding.errorTextView.visibility = View.GONE
                     binding.progressBar.visibility = View.VISIBLE
-
-                    Toast.makeText(
-                        requireContext(),
-                        "Loading...",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
         }
@@ -94,7 +77,7 @@ class ExchangeRatesDataFragment : Fragment() {
                 findNavController().navigate(action)
             } else {
                 Toast.makeText(requireContext(),
-                    "Wybierz konkretną walutę z jej wartością aby poznać szczegóły.",
+                    "Kliknij na wiersz z walutą.",
                     Toast.LENGTH_SHORT).show()
             }
         }

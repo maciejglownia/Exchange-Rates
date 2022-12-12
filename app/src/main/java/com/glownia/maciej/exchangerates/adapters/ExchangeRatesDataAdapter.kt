@@ -7,16 +7,16 @@ import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
 import com.glownia.maciej.exchangerates.databinding.SingleRowBinding
 
 class ExchangeRatesDataAdapter(
-    private val exchangeRateDataList: List<SingleRowDataPatternDto>,
+    private val exchangeRatesDataList: List<SingleRowDataPatternDto>,
     private val onItemClicked: (SingleRowDataPatternDto) -> Unit,
 ) : RecyclerView.Adapter<ExchangeRatesDataAdapter.ExchangeRatesDataViewHolder>() {
 
     class ExchangeRatesDataViewHolder(
         private val binding: SingleRowBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(exchangeRateData: SingleRowDataPatternDto) {
-            binding.nameTextView.text = exchangeRateData.name
-            binding.valueTextView.text = exchangeRateData.value
+        fun bind(exchangeRatesData: SingleRowDataPatternDto) {
+            binding.nameTextView.text = exchangeRatesData.name
+            binding.valueTextView.text = exchangeRatesData.value
         }
     }
 
@@ -26,12 +26,12 @@ class ExchangeRatesDataAdapter(
     }
 
     override fun onBindViewHolder(holder: ExchangeRatesDataViewHolder, position: Int) {
-        val currentExchangeRatesData = exchangeRateDataList[position]
+        val currentExchangeRatesData = exchangeRatesDataList[position]
         holder.itemView.setOnClickListener {
             onItemClicked(currentExchangeRatesData)
         }
         holder.bind(currentExchangeRatesData)
     }
 
-    override fun getItemCount(): Int = exchangeRateDataList.size
+    override fun getItemCount(): Int = exchangeRatesDataList.size
 }

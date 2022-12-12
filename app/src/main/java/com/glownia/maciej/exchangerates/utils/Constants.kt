@@ -13,9 +13,8 @@ object Constants {
     const val DAY_WORD = "Dzień"
 
     // TAGs
-    const val MAIN_VIEW_MODEL_TAG = "MainViewModel"
     const val EXCHANGE_RATES_FRAGMENT_TAG = "ExchangeRatesFragment"
 
     // Delays
-    const val GETTING_EXCHANGES_RATES_DAYA_FROM_API_TIME_DELAY = 1000L
+    const val GETTING_EXCHANGES_RATES_DAYA_FROM_API_TIME_DELAY = 200L
 }

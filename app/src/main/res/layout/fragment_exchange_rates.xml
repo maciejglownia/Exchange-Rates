@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_grey"
     tools:context=".ui.fragments.ExchangeRatesDataFragment">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -45,6 +46,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.43"
+        android:contentDescription="@string/image_for_no_internet_connection"
         app:tint="@color/grey"
         tools:visibility="visible" />
 
@@ -53,7 +55,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="No Internet Connection"
+        android:text="@string/text_no_internet_connection"
+        android:textColor="@color/grey"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/error_imageView"
         app:layout_constraintStart_toStartOf="@+id/error_imageView"

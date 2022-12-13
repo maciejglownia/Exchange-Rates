@@ -24,6 +24,7 @@ class ExchangeRatesDataFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val mainViewModel by viewModels<MainViewModel>()
+    var listToDisplay = ArrayList<SingleRowDataPatternDto>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +45,7 @@ class ExchangeRatesDataFragment : Fragment() {
                         binding.errorImageView.visibility = View.GONE
                         binding.errorTextView.visibility = View.GONE
                         binding.progressBar.visibility = View.GONE
+                        listToDisplay=it
                         setupRecyclerView(it)
                     }
                 }
@@ -84,6 +86,9 @@ class ExchangeRatesDataFragment : Fragment() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = exchangeRatesDataAdapter
+            mainViewModel.displayPosition.observe(viewLifecycleOwner) { displayPosition ->
+                (layoutManager as LinearLayoutManager).scrollToPosition(displayPosition)
+            }
             // https://stackoverflow.com/questions/26543131/how-to-implement-endless-list-with-recyclerview/26561717#26561717
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

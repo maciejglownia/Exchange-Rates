@@ -1,5 +1,6 @@
 package com.glownia.maciej.exchangerates.ui.viemodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,12 +24,12 @@ class MainViewModel : ViewModel() {
     private val repository: Repository = Repository()
 
     // Represents list contains  date and exchange rates for this day.
-    private val _exchangeRatesDataList = MutableLiveData<List<SingleRowDataPatternDto>>()
-    val exchangeRatesDataList: LiveData<List<SingleRowDataPatternDto>>
+    private val _exchangeRatesDataList = MutableLiveData<ArrayList<SingleRowDataPatternDto>>()
+    val exchangeRatesDataList: LiveData<ArrayList<SingleRowDataPatternDto>>
         get() = _exchangeRatesDataList
 
     // Represents current date when user open application. Date is in format "YYYY-MM-DD".
-    private var _requestedDate = LocalDate.now()
+    private var requestedDate = LocalDate.now()
 
     // Represents response status. Will be used during presenting content to user.
     private var _exchangeRatesDataResponse: MutableLiveData<NetworkResult<ExchangeRatesData>> =
@@ -36,6 +37,12 @@ class MainViewModel : ViewModel() {
     val exchangeRatesDataResponse: LiveData<NetworkResult<ExchangeRatesData>>
         get() = _exchangeRatesDataResponse
 
+    private val _displayPosition = MutableLiveData<Int>()
+    val displayPosition: LiveData<Int>
+        get() = _displayPosition
+
+    private val tempList = ArrayList<SingleRowDataPatternDto>()
+    private val testPosition = 0
     init {
         getExchangeRatesData()
     }
@@ -45,17 +52,21 @@ class MainViewModel : ViewModel() {
     }
 
     private suspend fun getExchangeRatesDataSafeCall() {
+        _displayPosition.value = testPosition
+
         _exchangeRatesDataResponse.value = NetworkResult.Loading()
         delay(Constants.GETTING_EXCHANGES_RATES_DAYA_FROM_API_TIME_DELAY)
         try {
-            val response = repository.getDataFromApi(_requestedDate.toString())
+            val response = repository.getDataFromApi(requestedDate.toString())
             _exchangeRatesDataResponse.value = handleExchangeRatesDataResponse(response)
             response.body()?.let {
                 createListContainingExchangeRatesDataGetFromApi(it)
             }
             // After every time when the app gets data from API, the requestedDate is
             // changing to previous one until it will meet the oldest available date in API.
-            _requestedDate = _requestedDate.minusDays(1)
+            requestedDate = requestedDate.minusDays(1)
+            _displayPosition.value = _displayPosition.value?.plus(171)
+
         } catch (e: IOException) {
             _exchangeRatesDataResponse.value = NetworkResult.Error("Exchange rates data not found.")
         } catch (e: HttpException) {
@@ -65,19 +76,20 @@ class MainViewModel : ViewModel() {
 
     // To this list a new object will be added -> list will be displaying in the ExchangeRateDataFragment
     private fun createListContainingExchangeRatesDataGetFromApi(result: ExchangeRatesData) {
-        val exchangeRatesDataList = ArrayList<SingleRowDataPatternDto>()
         val formattedDate = formatDateToOneNeededToDisplayToUser(result.date).toString()
-        exchangeRatesDataList.add(SingleRowDataPatternDto(DAY_WORD,
-            "$formattedDate :",
-            result.base,
-            formattedDate))
-        // Map iterating
+        tempList.add(
+            SingleRowDataPatternDto(
+                DAY_WORD,"$formattedDate :", result.base, formattedDate))
         result.rates.forEach { (currencySymbol, valueAccordingToBaseCurrency) ->
-            exchangeRatesDataList.add(SingleRowDataPatternDto("$currencySymbol :",
-                valueAccordingToBaseCurrency.toString(), result.base, formattedDate))
+            tempList.add(
+                SingleRowDataPatternDto(
+                    "$currencySymbol :", valueAccordingToBaseCurrency.toString(), result.base, formattedDate))
         }
-        _exchangeRatesDataList.value = exchangeRatesDataList
+        _exchangeRatesDataList.value = tempList
     }
+
+
+
 
     // Date needs to be formatted to display it to user in fragments in proper form.
     private fun formatDateToOneNeededToDisplayToUser(dateToFormat: String): String? {

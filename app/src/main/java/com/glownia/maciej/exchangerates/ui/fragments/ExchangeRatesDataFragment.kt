@@ -25,6 +25,8 @@ class ExchangeRatesDataFragment : Fragment() {
 
     private val mainViewModel by viewModels<MainViewModel>()
     var listToDisplay = ArrayList<SingleRowDataPatternDto>()
+    lateinit var exchangeRatesDataAdapter: ExchangeRatesDataAdapter
+    var lastPosition = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +47,7 @@ class ExchangeRatesDataFragment : Fragment() {
                         binding.errorImageView.visibility = View.GONE
                         binding.errorTextView.visibility = View.GONE
                         binding.progressBar.visibility = View.GONE
-                        listToDisplay=it
+                        listToDisplay = it
                         setupRecyclerView(it)
                     }
                 }
@@ -66,13 +68,8 @@ class ExchangeRatesDataFragment : Fragment() {
     }
 
     private fun setupRecyclerView(it: List<SingleRowDataPatternDto>) {
-        var previousTotal = 0
-        var loading = true
-        val visibleThreshold = 5
-        var firstVisibleItem: Int
-        var visibleItemCount: Int
-        var totalItemCount: Int
-        val exchangeRatesDataAdapter = ExchangeRatesDataAdapter(it) {
+
+        exchangeRatesDataAdapter = ExchangeRatesDataAdapter(it) {
             if (it.name != "Dzień") {
                 val action =
                     ExchangeRatesDataFragmentDirections.actionFirstFragmentToSecondFragment(it)
@@ -86,34 +83,58 @@ class ExchangeRatesDataFragment : Fragment() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = exchangeRatesDataAdapter
-            mainViewModel.displayPosition.observe(viewLifecycleOwner) { displayPosition ->
-                (layoutManager as LinearLayoutManager).scrollToPosition(displayPosition)
-            }
-            // https://stackoverflow.com/questions/26543131/how-to-implement-endless-list-with-recyclerview/26561717#26561717
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    visibleItemCount = recyclerView.childCount
-                    totalItemCount = (layoutManager as LinearLayoutManager).itemCount
-                    firstVisibleItem =
-                        (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                    if (loading) {
-                        if (totalItemCount > previousTotal) {
-                            loading = false
-                            previousTotal = totalItemCount
-                        }
-                    }
-                    if (!loading && totalItemCount - visibleItemCount
-                        <= firstVisibleItem + visibleThreshold
-                    ) {
-                        // End has been reached
-                        Log.i(EXCHANGE_RATES_FRAGMENT_TAG, "Last row has been met.")
-                        mainViewModel.getExchangeRatesData()
-                        loading = true
+//            savedPosition =
+//                (layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+            (layoutManager as LinearLayoutManager).scrollToPosition(lastPosition)
+//            mainViewModel.displayPosition.observe(viewLifecycleOwner) { displayPosition ->
+//                (layoutManager as LinearLayoutManager).scrollToPosition(displayPosition)
+//            }
+            handleGettingNewRequestWhenScrollToBottomOfList()
+        }
+    }
+
+    private fun RecyclerView.handleGettingNewRequestWhenScrollToBottomOfList() {
+        var previousTotal = 0
+        var loading = true
+        val visibleThreshold = 5
+        var firstVisibleItem: Int
+        var visibleItemCount: Int
+        var totalItemCount: Int
+        // https://stackoverflow.com/questions/26543131/how-to-implement-endless-list-with-recyclerview/26561717#26561717
+        addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                visibleItemCount = recyclerView.childCount
+                totalItemCount = (layoutManager as LinearLayoutManager).itemCount
+                firstVisibleItem =
+                    (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                if (loading) {
+                    if (totalItemCount > previousTotal) {
+                        loading = false
+                        previousTotal = totalItemCount
                     }
                 }
-            })
-        }
+                if (!loading && totalItemCount - visibleItemCount
+                    <= firstVisibleItem + visibleThreshold
+                ) {
+                    // End has been reached
+                    Log.i(EXCHANGE_RATES_FRAGMENT_TAG, "Last row has been met.")
+                    mainViewModel.getExchangeRatesData()
+                    loading = true
+                }
+            }
+        })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        lastPosition =
+            (binding.recyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPosition(lastPosition)
     }
 
     override fun onDestroyView() {

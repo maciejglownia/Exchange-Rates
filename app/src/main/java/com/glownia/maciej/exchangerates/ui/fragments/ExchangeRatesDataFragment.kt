@@ -83,12 +83,9 @@ class ExchangeRatesDataFragment : Fragment() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = exchangeRatesDataAdapter
-//            savedPosition =
-//                (layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
-            (layoutManager as LinearLayoutManager).scrollToPosition(lastPosition)
-//            mainViewModel.displayPosition.observe(viewLifecycleOwner) { displayPosition ->
-//                (layoutManager as LinearLayoutManager).scrollToPosition(displayPosition)
-//            }
+            mainViewModel.displayPosition.observe(viewLifecycleOwner) { displayPosition ->
+                (layoutManager as LinearLayoutManager).scrollToPosition(displayPosition)
+            }
             handleGettingNewRequestWhenScrollToBottomOfList()
         }
     }
@@ -134,7 +131,9 @@ class ExchangeRatesDataFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        // TODO to tylko gdy wraca z Single Fragment
         (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPosition(lastPosition)
+
     }
 
     override fun onDestroyView() {

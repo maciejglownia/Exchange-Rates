@@ -15,7 +15,7 @@ import com.glownia.maciej.exchangerates.adapters.ExchangeRatesDataAdapter
 import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
 import com.glownia.maciej.exchangerates.databinding.FragmentExchangeRatesBinding
 import com.glownia.maciej.exchangerates.ui.viemodels.MainViewModel
-import com.glownia.maciej.exchangerates.utils.Constants.EXCHANGE_RATES_FRAGMENT_TAG
+import com.glownia.maciej.exchangerates.utils.Constants.EXCHANGE_RATES_DATA_FRAGMENT_TAG
 import com.glownia.maciej.exchangerates.utils.NetworkResult
 
 class ExchangeRatesDataFragment : Fragment() {
@@ -40,35 +40,31 @@ class ExchangeRatesDataFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel.exchangeRatesDataResponse.observe(viewLifecycleOwner) { response ->
+            showShimmerEffect()
             when (response) {
                 is NetworkResult.Success -> {
+                    hideShimmerEffect()
+                    Log.d(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "onViewCreated: network success.")
                     mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) {
-                        binding.recyclerView.visibility = View.VISIBLE
-                        binding.errorImageView.visibility = View.GONE
-                        binding.errorTextView.visibility = View.GONE
-                        binding.progressBar.visibility = View.GONE
+//                        binding.recyclerView.visibility = View.VISIBLE
                         listToDisplay = it
-                        setupRecyclerView(it)
+                        setupRecyclerView(listToDisplay)
                     }
                 }
                 is NetworkResult.Error -> {
-                    binding.recyclerView.visibility = View.GONE
-                    binding.errorImageView.visibility = View.VISIBLE
-                    binding.errorTextView.visibility = View.VISIBLE
-                    binding.progressBar.visibility = View.GONE
+                    Log.d(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "onViewCreated: network error.")
+                    hideShimmerEffect()
+                    showErrorView()
                 }
                 is NetworkResult.Loading -> {
-                    binding.recyclerView.visibility = View.GONE
-                    binding.errorImageView.visibility = View.GONE
-                    binding.errorTextView.visibility = View.GONE
-                    binding.progressBar.visibility = View.VISIBLE
+                    Log.d(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "onViewCreated: network loading.")
+                    showShimmerEffect()
                 }
             }
         }
     }
 
     private fun setupRecyclerView(it: List<SingleRowDataPatternDto>) {
-
         exchangeRatesDataAdapter = ExchangeRatesDataAdapter(it) {
             if (it.name != "Dzień") {
                 val action =
@@ -88,6 +84,7 @@ class ExchangeRatesDataFragment : Fragment() {
             }
             handleGettingNewRequestWhenScrollToBottomOfList()
         }
+        hideShimmerEffect()
     }
 
     private fun RecyclerView.handleGettingNewRequestWhenScrollToBottomOfList() {
@@ -115,7 +112,7 @@ class ExchangeRatesDataFragment : Fragment() {
                     <= firstVisibleItem + visibleThreshold
                 ) {
                     // End has been reached
-                    Log.i(EXCHANGE_RATES_FRAGMENT_TAG, "Last row has been met.")
+                    Log.i(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "Last row has been met.")
                     mainViewModel.getExchangeRatesData()
                     loading = true
                 }
@@ -131,9 +128,31 @@ class ExchangeRatesDataFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // TODO to tylko gdy wraca z Single Fragment
         (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPosition(lastPosition)
+    }
 
+    private fun showShimmerEffect() {
+        binding.shimmerFrameLayout.startShimmer()
+        binding.shimmerFrameLayout.visibility = View.VISIBLE
+        binding.recyclerView.visibility = View.GONE
+        hideErrorView()
+    }
+
+    private fun hideShimmerEffect() {
+        binding.shimmerFrameLayout.stopShimmer()
+        binding.shimmerFrameLayout.visibility = View.GONE
+        binding.recyclerView.visibility = View.VISIBLE
+        hideErrorView()
+    }
+
+    private fun hideErrorView() {
+        binding.errorImageView.visibility = View.GONE
+        binding.errorTextView.visibility = View.GONE
+    }
+
+    private fun showErrorView() {
+        binding.errorImageView.visibility = View.VISIBLE
+        binding.errorTextView.visibility = View.VISIBLE
     }
 
     override fun onDestroyView() {

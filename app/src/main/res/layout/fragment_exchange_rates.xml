@@ -8,30 +8,45 @@
     android:background="@color/light_grey"
     tools:context=".ui.fragments.ExchangeRatesDataFragment">
 
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerFrameLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+            <include layout="@layout/placeholder_row_layout" />
+        </LinearLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"
         tools:listitem="@layout/single_row" />
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45"
-        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/error_imageView"
@@ -39,7 +54,7 @@
         android:layout_height="100dp"
         android:layout_centerInParent="true"
         android:src="@drawable/ic_sad"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -57,7 +72,7 @@
         android:layout_centerHorizontal="true"
         android:text="@string/text_no_internet_connection"
         android:textColor="@color/grey"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/error_imageView"
         app:layout_constraintStart_toStartOf="@+id/error_imageView"
         app:layout_constraintTop_toBottomOf="@+id/error_imageView"

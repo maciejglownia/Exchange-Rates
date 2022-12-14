@@ -1,8 +1,5 @@
 package com.glownia.maciej.exchangerates.utils
 
-import androidx.viewbinding.BuildConfig
-import com.glownia.maciej.exchangerates.BuildConfig.FIXER_ACCESS_KEY
-
 
 object Constants {
 
@@ -15,7 +12,7 @@ object Constants {
     const val DAY_WORD = "Dzień"
 
     // TAGs
-    const val EXCHANGE_RATES_FRAGMENT_TAG = "ExchangeRatesFragment"
+    const val EXCHANGE_RATES_DATA_FRAGMENT_TAG = "ExchangeRatesDataFragment"
 
     // Delays
     const val GETTING_EXCHANGES_RATES_DAYA_FROM_API_TIME_DELAY = 200L

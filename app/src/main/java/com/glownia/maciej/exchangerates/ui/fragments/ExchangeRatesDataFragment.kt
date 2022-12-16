@@ -43,10 +43,9 @@ class ExchangeRatesDataFragment : Fragment() {
             showShimmerEffect()
             when (response) {
                 is NetworkResult.Success -> {
-                    hideShimmerEffect()
                     Log.d(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "onViewCreated: network success.")
+                    hideShimmerEffect()
                     mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) {
-//                        binding.recyclerView.visibility = View.VISIBLE
                         listToDisplay = it
                         setupRecyclerView(listToDisplay)
                     }
@@ -78,13 +77,12 @@ class ExchangeRatesDataFragment : Fragment() {
         }
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = exchangeRatesDataAdapter
             mainViewModel.displayPosition.observe(viewLifecycleOwner) { displayPosition ->
                 (layoutManager as LinearLayoutManager).scrollToPosition(displayPosition)
             }
-            handleGettingNewRequestWhenScrollToBottomOfList()
+            adapter = exchangeRatesDataAdapter
+//            handleGettingNewRequestWhenScrollToBottomOfList()
         }
-        hideShimmerEffect()
     }
 
     private fun RecyclerView.handleGettingNewRequestWhenScrollToBottomOfList() {

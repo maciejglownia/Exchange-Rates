@@ -7,8 +7,12 @@ import retrofit2.http.*
 
 interface ExchangeRatesDataApi {
 
-    @GET("/fixer/{date}")
-    @Headers("apikey: $CLIENT_ID")
-//    @Headers("apikey: UJKb") // this line is to test responses
+
+//    @GET("/fixer/{date}")
+//    @Headers("apikey: $CLIENT_ID")
+    /**
+     * Gets data from a server on local machine: ktor-exchange-rates
+     */
+    @GET("/{date}")
     suspend fun fetchExchangeRatesData(@Path("date") date: String): Response<ExchangeRatesData>
 }

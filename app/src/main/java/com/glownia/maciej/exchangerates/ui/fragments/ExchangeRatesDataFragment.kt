@@ -25,8 +25,11 @@ class ExchangeRatesDataFragment : Fragment() {
 
     private val mainViewModel by viewModels<MainViewModel>()
     var listToDisplay = ArrayList<SingleRowDataPatternDto>()
+
     lateinit var exchangeRatesDataAdapter: ExchangeRatesDataAdapter
+
     var lastPosition = 0
+    var countRequest = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,15 +42,16 @@ class ExchangeRatesDataFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupRecyclerView()
+
         mainViewModel.exchangeRatesDataResponse.observe(viewLifecycleOwner) { response ->
             showShimmerEffect()
             when (response) {
                 is NetworkResult.Success -> {
                     Log.d(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "onViewCreated: network success.")
                     hideShimmerEffect()
-                    mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) {
-                        listToDisplay = it
-                        setupRecyclerView(listToDisplay)
+                    mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) { listOfAllRecords ->
+                        exchangeRatesDataAdapter.differ.submitList(listOfAllRecords)
                     }
                 }
                 is NetworkResult.Error -> {
@@ -61,10 +65,7 @@ class ExchangeRatesDataFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun setupRecyclerView(it: List<SingleRowDataPatternDto>) {
-        exchangeRatesDataAdapter = ExchangeRatesDataAdapter(it) {
+        exchangeRatesDataAdapter.setOnItemClickListener {
             if (it.name != "Dzień") {
                 val action =
                     ExchangeRatesDataFragmentDirections.actionFirstFragmentToSecondFragment(it)
@@ -75,47 +76,28 @@ class ExchangeRatesDataFragment : Fragment() {
                     Toast.LENGTH_SHORT).show()
             }
         }
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            mainViewModel.displayPosition.observe(viewLifecycleOwner) { displayPosition ->
-                (layoutManager as LinearLayoutManager).scrollToPosition(displayPosition)
-            }
-            adapter = exchangeRatesDataAdapter
-//            handleGettingNewRequestWhenScrollToBottomOfList()
-        }
     }
 
-    private fun RecyclerView.handleGettingNewRequestWhenScrollToBottomOfList() {
-        var previousTotal = 0
-        var loading = true
-        val visibleThreshold = 5
-        var firstVisibleItem: Int
-        var visibleItemCount: Int
-        var totalItemCount: Int
-        // https://stackoverflow.com/questions/26543131/how-to-implement-endless-list-with-recyclerview/26561717#26561717
-        addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                visibleItemCount = recyclerView.childCount
-                totalItemCount = (layoutManager as LinearLayoutManager).itemCount
-                firstVisibleItem =
-                    (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                if (loading) {
-                    if (totalItemCount > previousTotal) {
-                        loading = false
-                        previousTotal = totalItemCount
+    private fun setupRecyclerView() {
+        exchangeRatesDataAdapter = ExchangeRatesDataAdapter()
+        binding.recyclerView.apply {
+            adapter = exchangeRatesDataAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        Log.d("-----", "end")
+                        Toast.makeText(requireContext(), "Last", Toast.LENGTH_LONG).show()
+                        mainViewModel.getExchangeRatesData()
+                        countRequest++
+                        Toast.makeText(requireContext(),
+                            "request number: $countRequest ",
+                            Toast.LENGTH_SHORT).show()
                     }
                 }
-                if (!loading && totalItemCount - visibleItemCount
-                    <= firstVisibleItem + visibleThreshold
-                ) {
-                    // End has been reached
-                    Log.i(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "Last row has been met.")
-                    mainViewModel.getExchangeRatesData()
-                    loading = true
-                }
-            }
-        })
+            })
+        }
     }
 
     override fun onPause() {
@@ -149,6 +131,7 @@ class ExchangeRatesDataFragment : Fragment() {
     }
 
     private fun showErrorView() {
+        binding.recyclerView.visibility = View.GONE
         binding.errorImageView.visibility = View.VISIBLE
         binding.errorTextView.visibility = View.VISIBLE
     }

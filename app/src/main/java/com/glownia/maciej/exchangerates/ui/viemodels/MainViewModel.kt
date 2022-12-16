@@ -52,7 +52,7 @@ class MainViewModel : ViewModel() {
     }
 
     private suspend fun getExchangeRatesDataSafeCall() {
-        _displayPosition.value = testPosition
+//        _displayPosition.value = testPosition
 
         _exchangeRatesDataResponse.value = NetworkResult.Loading()
         delay(Constants.GETTING_EXCHANGES_RATES_DAYA_FROM_API_TIME_DELAY)
@@ -65,7 +65,7 @@ class MainViewModel : ViewModel() {
             // After every time when the app gets data from API, the requestedDate is
             // changing to previous one until it will meet the oldest available date in API.
             requestedDate = requestedDate.minusDays(1)
-            _displayPosition.value = _displayPosition.value?.plus(171)
+//            _displayPosition.value = _displayPosition.value?.plus(171)
 
         } catch (e: IOException) {
             _exchangeRatesDataResponse.value = NetworkResult.Error("Exchange rates data not found.")
@@ -87,9 +87,6 @@ class MainViewModel : ViewModel() {
         }
         _exchangeRatesDataList.value = tempList
     }
-
-
-
 
     // Date needs to be formatted to display it to user in fragments in proper form.
     private fun formatDateToOneNeededToDisplayToUser(dateToFormat: String): String? {

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_grey"
-    tools:context=".ui.fragments.SingleExchangeRateFragment">
+    tools:context=".ui.fragments.RateDetailsFragment">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

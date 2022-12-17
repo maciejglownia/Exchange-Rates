@@ -14,9 +14,9 @@ import kotlinx.parcelize.Parcelize
  * JSON object.
  */
 @Parcelize
-data class SingleRowDataPatternDto(
+data class RatesDto(
     val name: String,
     val value: String,
     val base: String,
     val date: String,
-): Parcelable
+) : Parcelable

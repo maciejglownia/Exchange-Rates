@@ -1,12 +1,11 @@
 package com.glownia.maciej.exchangerates.ui.viemodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.glownia.maciej.exchangerates.data.ExchangeRatesData
-import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
+import com.glownia.maciej.exchangerates.models.Rates
+import com.glownia.maciej.exchangerates.data.RatesDto
 import com.glownia.maciej.exchangerates.repository.Repository
 import com.glownia.maciej.exchangerates.utils.Constants
 import com.glownia.maciej.exchangerates.utils.Constants.DAY_WORD
@@ -24,68 +23,68 @@ class MainViewModel : ViewModel() {
     private val repository: Repository = Repository()
 
     // Represents list contains  date and exchange rates for this day.
-    private val _exchangeRatesDataList = MutableLiveData<ArrayList<SingleRowDataPatternDto>>()
-    val exchangeRatesDataList: LiveData<ArrayList<SingleRowDataPatternDto>>
-        get() = _exchangeRatesDataList
+    private val _ratesList = MutableLiveData<ArrayList<RatesDto>>()
+    val ratesList: LiveData<ArrayList<RatesDto>>
+        get() = _ratesList
 
     // Represents current date when user open application. Date is in format "YYYY-MM-DD".
     private var requestedDate = LocalDate.now()
 
     // Represents response status. Will be used during presenting content to user.
-    private var _exchangeRatesDataResponse: MutableLiveData<NetworkResult<ExchangeRatesData>> =
+    private var _ratesResponse: MutableLiveData<NetworkResult<Rates>> =
         MutableLiveData()
-    val exchangeRatesDataResponse: LiveData<NetworkResult<ExchangeRatesData>>
-        get() = _exchangeRatesDataResponse
+    val ratesResponse: LiveData<NetworkResult<Rates>>
+        get() = _ratesResponse
 
-    private val _displayPosition = MutableLiveData<Int>()
-    val displayPosition: LiveData<Int>
-        get() = _displayPosition
+    private val tempList = ArrayList<RatesDto>()
 
-    private val tempList = ArrayList<SingleRowDataPatternDto>()
-    private val testPosition = 0
     init {
-        getExchangeRatesData()
+        getRates()
     }
 
-    fun getExchangeRatesData() = viewModelScope.launch {
-        getExchangeRatesDataSafeCall()
+    fun getRates() = viewModelScope.launch {
+        getRatesSafeCall()
     }
 
-    private suspend fun getExchangeRatesDataSafeCall() {
-//        _displayPosition.value = testPosition
-
-        _exchangeRatesDataResponse.value = NetworkResult.Loading()
-        delay(Constants.GETTING_EXCHANGES_RATES_DAYA_FROM_API_TIME_DELAY)
+    private suspend fun getRatesSafeCall() {
+        _ratesResponse.value = NetworkResult.Loading()
+        delay(Constants.GETTING_RATES_FROM_API_TIME_DELAY)
         try {
-            val response = repository.getDataFromApi(requestedDate.toString())
-            _exchangeRatesDataResponse.value = handleExchangeRatesDataResponse(response)
+            val response = repository.getRates(requestedDate.toString())
+            _ratesResponse.value = handleRatesResponse(response)
             response.body()?.let {
-                createListContainingExchangeRatesDataGetFromApi(it)
+                createListContainingRates(it)
             }
-            // After every time when the app gets data from API, the requestedDate is
-            // changing to previous one until it will meet the oldest available date in API.
             requestedDate = requestedDate.minusDays(1)
-//            _displayPosition.value = _displayPosition.value?.plus(171)
-
         } catch (e: IOException) {
-            _exchangeRatesDataResponse.value = NetworkResult.Error("Exchange rates data not found.")
+            _ratesResponse.value = NetworkResult.Error("Exchange rates data not found.")
         } catch (e: HttpException) {
-            _exchangeRatesDataResponse.value = NetworkResult.Error("No Internet Connection.")
+            _ratesResponse.value = NetworkResult.Error("No Internet Connection.")
         }
     }
 
     // To this list a new object will be added -> list will be displaying in the ExchangeRateDataFragment
-    private fun createListContainingExchangeRatesDataGetFromApi(result: ExchangeRatesData) {
+    private fun createListContainingRates(result: Rates) {
         val formattedDate = formatDateToOneNeededToDisplayToUser(result.date).toString()
         tempList.add(
-            SingleRowDataPatternDto(
-                DAY_WORD,"$formattedDate :", result.base, formattedDate))
+            RatesDto(
+                name = DAY_WORD,
+                value = formattedDate,
+                base = result.base,
+                date = formattedDate
+            )
+        )
         result.rates.forEach { (currencySymbol, valueAccordingToBaseCurrency) ->
             tempList.add(
-                SingleRowDataPatternDto(
-                    "$currencySymbol :", valueAccordingToBaseCurrency.toString(), result.base, formattedDate))
+                RatesDto(
+                    name = currencySymbol,
+                    value = valueAccordingToBaseCurrency.toString(),
+                    base = result.base,
+                    date = formattedDate
+                )
+            )
         }
-        _exchangeRatesDataList.value = tempList
+        _ratesList.value = tempList
     }
 
     // Date needs to be formatted to display it to user in fragments in proper form.
@@ -95,8 +94,12 @@ class MainViewModel : ViewModel() {
         return LocalDate.parse(dateToFormat, formatter).format(formatter2)
     }
 
-    private fun handleExchangeRatesDataResponse(response: Response<ExchangeRatesData>): NetworkResult<ExchangeRatesData> {
+    private fun handleRatesResponse(response: Response<Rates>): NetworkResult<Rates> {
         when {
+            response.isSuccessful -> {
+                val exchangeRatesData = response.body()
+                return NetworkResult.Success(exchangeRatesData!!)
+            }
             response.message().toString().contains("timeout") -> {
                 return NetworkResult.Error("Timeout.")
             }
@@ -115,10 +118,6 @@ class MainViewModel : ViewModel() {
             response.body()!!.date.isEmpty() || response.body()!!.base.isEmpty() ||
                     response.body()!!.rates.isEmpty() -> {
                 return NetworkResult.Error("Exchange rates data not found.")
-            }
-            response.isSuccessful -> {
-                val exchangeRatesData = response.body()
-                return NetworkResult.Success(exchangeRatesData!!)
             }
             else -> {
                 return NetworkResult.Error(response.message())

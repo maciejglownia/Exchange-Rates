@@ -26,7 +26,7 @@ class RetrofitInstance {
          * API object will be used everywhere to network request
          */
         val api by lazy {
-            retrofit.create(ExchangeRatesDataApi::class.java)
+            retrofit.create(RatesApi::class.java)
         }
     }
 }

@@ -11,22 +11,22 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.glownia.maciej.exchangerates.adapters.ExchangeRatesDataAdapter
-import com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto
-import com.glownia.maciej.exchangerates.databinding.FragmentExchangeRatesBinding
+import com.glownia.maciej.exchangerates.adapters.RatesAdapter
+import com.glownia.maciej.exchangerates.data.RatesDto
+import com.glownia.maciej.exchangerates.databinding.FragmentRatesBinding
 import com.glownia.maciej.exchangerates.ui.viemodels.MainViewModel
-import com.glownia.maciej.exchangerates.utils.Constants.EXCHANGE_RATES_DATA_FRAGMENT_TAG
+import com.glownia.maciej.exchangerates.utils.Constants.RATES_FRAGMENT
 import com.glownia.maciej.exchangerates.utils.NetworkResult
 
-class ExchangeRatesDataFragment : Fragment() {
+class RatesFragment : Fragment() {
 
-    private var _binding: FragmentExchangeRatesBinding? = null
+    private var _binding: FragmentRatesBinding? = null
     private val binding get() = _binding!!
 
     private val mainViewModel by viewModels<MainViewModel>()
-    var listToDisplay = ArrayList<SingleRowDataPatternDto>()
+    var listToDisplay = ArrayList<RatesDto>()
 
-    lateinit var exchangeRatesDataAdapter: ExchangeRatesDataAdapter
+    lateinit var ratesAdapter: RatesAdapter
 
     var lastPosition = 0
     var countRequest = 0
@@ -35,7 +35,7 @@ class ExchangeRatesDataFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentExchangeRatesBinding.inflate(inflater, container, false)
+        _binding = FragmentRatesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -44,31 +44,31 @@ class ExchangeRatesDataFragment : Fragment() {
 
         setupRecyclerView()
 
-        mainViewModel.exchangeRatesDataResponse.observe(viewLifecycleOwner) { response ->
+        mainViewModel.ratesResponse.observe(viewLifecycleOwner) { response ->
             showShimmerEffect()
             when (response) {
                 is NetworkResult.Success -> {
-                    Log.d(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "onViewCreated: network success.")
+                    Log.d(RATES_FRAGMENT, "onViewCreated: network success.")
                     hideShimmerEffect()
-                    mainViewModel.exchangeRatesDataList.observe(viewLifecycleOwner) { listOfAllRecords ->
-                        exchangeRatesDataAdapter.differ.submitList(listOfAllRecords)
+                    mainViewModel.ratesList.observe(viewLifecycleOwner) { listOfAllRecords ->
+                        ratesAdapter.differ.submitList(listOfAllRecords)
                     }
                 }
                 is NetworkResult.Error -> {
-                    Log.d(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "onViewCreated: network error.")
+                    Log.d(RATES_FRAGMENT, "onViewCreated: network error.")
                     hideShimmerEffect()
                     showErrorView()
                 }
                 is NetworkResult.Loading -> {
-                    Log.d(EXCHANGE_RATES_DATA_FRAGMENT_TAG, "onViewCreated: network loading.")
+                    Log.d(RATES_FRAGMENT, "onViewCreated: network loading.")
                     showShimmerEffect()
                 }
             }
         }
-        exchangeRatesDataAdapter.setOnItemClickListener {
+        ratesAdapter.setOnItemClickListener {
             if (it.name != "Dzień") {
                 val action =
-                    ExchangeRatesDataFragmentDirections.actionFirstFragmentToSecondFragment(it)
+                    RatesFragmentDirections.actionFirstFragmentToSecondFragment(it)
                 findNavController().navigate(action)
             } else {
                 Toast.makeText(requireContext(),
@@ -79,9 +79,9 @@ class ExchangeRatesDataFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        exchangeRatesDataAdapter = ExchangeRatesDataAdapter()
+        ratesAdapter = RatesAdapter()
         binding.recyclerView.apply {
-            adapter = exchangeRatesDataAdapter
+            adapter = ratesAdapter
             layoutManager = LinearLayoutManager(requireContext())
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -89,7 +89,7 @@ class ExchangeRatesDataFragment : Fragment() {
                     if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
                         Log.d("-----", "end")
                         Toast.makeText(requireContext(), "Last", Toast.LENGTH_LONG).show()
-                        mainViewModel.getExchangeRatesData()
+                        mainViewModel.getRates()
                         countRequest++
                         Toast.makeText(requireContext(),
                             "request number: $countRequest ",
@@ -108,7 +108,7 @@ class ExchangeRatesDataFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPosition(lastPosition)
+        (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPosition(lastPosition - 1)
     }
 
     private fun showShimmerEffect() {

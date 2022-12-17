@@ -3,7 +3,7 @@ package com.glownia.maciej.exchangerates.utils
 
 object Constants {
 
-//    const val BASE_URL = "https://api.apilayer.com/"
+    // const val BASE_URL = "https://api.apilayer.com/"
 
     // Communication
     /**
@@ -16,11 +16,11 @@ object Constants {
     const val CLIENT_ID = "w1Gx33qyp9mNVFbWV5owOQkcUVuBd2an"
 
     // Names to display
-    const val DAY_WORD = "Dzień"
+    const val DAY_WORD = "Day"
 
     // TAGs
-    const val EXCHANGE_RATES_DATA_FRAGMENT_TAG = "ExchangeRatesDataFragment"
+    const val RATES_FRAGMENT = "RatesFragment"
 
     // Delays
-    const val GETTING_EXCHANGES_RATES_DAYA_FROM_API_TIME_DELAY = 200L
+    const val GETTING_RATES_FROM_API_TIME_DELAY = 200L
 }

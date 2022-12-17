@@ -7,15 +7,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.glownia.maciej.exchangerates.databinding.FragmentSingleExchangeRateBinding
+import com.glownia.maciej.exchangerates.databinding.FragmentRateDetailsBinding
 import com.glownia.maciej.exchangerates.ui.viemodels.MainViewModel
 
-class SingleExchangeRateFragment : Fragment() {
+class RateDetailsFragment : Fragment() {
 
     private val mainViewModel by viewModels<MainViewModel>()
-    private val args: SingleExchangeRateFragmentArgs by navArgs()
+    private val args: RateDetailsFragmentArgs by navArgs()
 
-    private var _binding: FragmentSingleExchangeRateBinding? = null
+    private var _binding: FragmentRateDetailsBinding? = null
 
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
@@ -24,17 +24,17 @@ class SingleExchangeRateFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentSingleExchangeRateBinding.inflate(inflater, container, false)
+        _binding = FragmentRateDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val argumentData = args.exchangeRatesDataArgument
+        val rate = args.rate
         binding.apply {
-            dateTextView.text = argumentData.date
-            valueTextView.text = argumentData.value
+            dateTextView.text = rate.date
+            valueTextView.text = rate.value
         }
     }
 

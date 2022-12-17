@@ -9,9 +9,10 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <string name="single_row_name_example">AUD:</string>
-    <string name="single_row_value_example">0.3682</string>
+    <string name="single_row_name_example">AUD</string>
+    <string name="single_row_value_example">ABCDE</string>
     <string name="date">Date</string>
     <string name="image_for_no_internet_connection">Image for no Internet connection</string>
     <string name="text_no_internet_connection">Something went wrong!</string>
+    <string name="semicolon_char">:</string>
 </resources>

@@ -1,12 +1,12 @@
-package com.glownia.maciej.exchangerates.data
+package com.glownia.maciej.exchangerates.models
 
 import com.google.gson.annotations.SerializedName
 
 /**
  * JSON object which contains all values needed to display data in single rows.
- * @see [SingleRowDataPatternDto]
+ * @see [RatesDto]
  */
-data class ExchangeRatesData(
+data class Rates(
     @SerializedName("base")
     val base: String,
     @SerializedName("date")

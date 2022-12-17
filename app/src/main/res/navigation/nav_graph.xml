@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.glownia.maciej.exchangerates.ui.fragments.ExchangeRatesDataFragment"
+        android:name="com.glownia.maciej.exchangerates.ui.fragments.RatesFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_exchange_rates">
+        tools:layout="@layout/fragment_rates">
 
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
@@ -17,15 +17,15 @@
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="com.glownia.maciej.exchangerates.ui.fragments.SingleExchangeRateFragment"
+        android:name="com.glownia.maciej.exchangerates.ui.fragments.RateDetailsFragment"
         android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_single_exchange_rate">
+        tools:layout="@layout/fragment_rate_details">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
         <argument
-            android:name="exchangeRatesDataArgument"
-            app:argType="com.glownia.maciej.exchangerates.data.SingleRowDataPatternDto" />
+            android:name="rate"
+            app:argType="com.glownia.maciej.exchangerates.data.RatesDto" />
     </fragment>
 </navigation>

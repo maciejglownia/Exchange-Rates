@@ -12,9 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.glownia.maciej.exchangerates.adapters.RatesAdapter
-import com.glownia.maciej.exchangerates.data.RatesDto
 import com.glownia.maciej.exchangerates.databinding.FragmentRatesBinding
 import com.glownia.maciej.exchangerates.ui.viemodels.MainViewModel
+import com.glownia.maciej.exchangerates.utils.Constants.DAY_WORD
 import com.glownia.maciej.exchangerates.utils.Constants.RATES_FRAGMENT
 import com.glownia.maciej.exchangerates.utils.NetworkResult
 
@@ -24,12 +24,8 @@ class RatesFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val mainViewModel by viewModels<MainViewModel>()
-    var listToDisplay = ArrayList<RatesDto>()
-
     lateinit var ratesAdapter: RatesAdapter
-
     var lastPosition = 0
-    var countRequest = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,32 +44,32 @@ class RatesFragment : Fragment() {
             showShimmerEffect()
             when (response) {
                 is NetworkResult.Success -> {
-                    Log.d(RATES_FRAGMENT, "onViewCreated: network success.")
+                    Log.d(RATES_FRAGMENT, "onViewCreated: Network success.")
                     hideShimmerEffect()
                     mainViewModel.ratesList.observe(viewLifecycleOwner) { listOfAllRecords ->
                         ratesAdapter.differ.submitList(listOfAllRecords)
                     }
                 }
                 is NetworkResult.Error -> {
-                    Log.d(RATES_FRAGMENT, "onViewCreated: network error.")
+                    Log.d(RATES_FRAGMENT, "onViewCreated: Network error.")
                     hideShimmerEffect()
                     showErrorView()
                 }
                 is NetworkResult.Loading -> {
-                    Log.d(RATES_FRAGMENT, "onViewCreated: network loading.")
+                    Log.d(RATES_FRAGMENT, "onViewCreated: Network loading.")
                     showShimmerEffect()
                 }
             }
         }
         ratesAdapter.setOnItemClickListener {
-            if (it.name != "Dzień") {
+            if (it.name != DAY_WORD) {
                 val action =
                     RatesFragmentDirections.actionFirstFragmentToSecondFragment(it)
                 findNavController().navigate(action)
             } else {
                 Toast.makeText(requireContext(),
-                    "Kliknij na wiersz z walutą.",
-                    Toast.LENGTH_SHORT).show()
+                    "Click on symbol / value row",
+                    Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -87,13 +83,8 @@ class RatesFragment : Fragment() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        Log.d("-----", "end")
-                        Toast.makeText(requireContext(), "Last", Toast.LENGTH_LONG).show()
+                        Log.d(RATES_FRAGMENT, "end")
                         mainViewModel.getRates()
-                        countRequest++
-                        Toast.makeText(requireContext(),
-                            "request number: $countRequest ",
-                            Toast.LENGTH_SHORT).show()
                     }
                 }
             })

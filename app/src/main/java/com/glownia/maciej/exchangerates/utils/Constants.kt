@@ -9,7 +9,8 @@ object Constants {
     /**
      * @param BASE_URL
      * To obtain this URL from your local machine go to start -> cmd -> ipconfig -> Ipv4
-     * You need it to communicate with your Android application instead of e.g. localhost:8080
+     * You need it to communicate with your ktor-exchange-rates server, instead of e.g. localhost:8080
+     * Make sure your network is set to private.
      */
     const val BASE_URL = "http://192.168.0.17:8080/" // when http -> android:usesCleartextTraffic="true"
 

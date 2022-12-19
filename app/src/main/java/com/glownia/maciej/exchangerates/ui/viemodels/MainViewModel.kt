@@ -68,19 +68,15 @@ class MainViewModel : ViewModel() {
         val formattedDate = formatDateToOneNeededToDisplayToUser(result.date).toString()
         tempList.add(
             RatesDto(
-                name = DAY_WORD,
-                value = formattedDate,
-                base = result.base,
-                date = formattedDate
+                date = formattedDate,
             )
         )
         result.rates.forEach { (currencySymbol, valueAccordingToBaseCurrency) ->
             tempList.add(
                 RatesDto(
                     name = currencySymbol,
+                    date = formattedDate,
                     value = valueAccordingToBaseCurrency.toString(),
-                    base = result.base,
-                    date = formattedDate
                 )
             )
         }
